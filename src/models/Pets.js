@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 const PetSchema = new mongoose.model({
-    name: {
+    name:{
         type: String,
         required: true
     },
