@@ -1,16 +1,17 @@
 const router = require("express").Router()
 const PetController = require("../controllers/PetsController")
+const checkToken = require("../utils/checkToken")
 
-router.post("/pets/new/:user_id", PetController.newPet)
+router.post("/pets/new/:user_id", checkToken,  PetController.newPet)
 
-router.get("/pets/find/all", PetController.findAll)
-router.get("/pets/find/race", PetController.findRice)
-router.get("/pets/find/specie", PetController.findSpecie)
-router.get("/pets/:pet_id", PetController.findPetById)
-router.get("/pets/find/:user_id", PetController.findPetByUser)
+router.get("/pets/find/all", checkToken,PetController.findAll)
+router.get("/pets/find/race", checkToken, PetController.findRice)
+router.get("/pets/find/specie", checkToken, PetController.findSpecie)
+router.get("/pets/:pet_id", checkToken, PetController.findPetById)
+router.get("/pets/find/:user_id", checkToken, PetController.findPetByUser)
 
-router.put("/pets/alter/:user_id/:pet_id", PetController.alterPet)
+router.put("/pets/alter/:user_id/:pet_id", checkToken, PetController.alterPet)
 
-router.delete("/pets/delete/:user_id/:pet_id", PetController.deletePet)
+router.delete("/pets/delete/:user_id/:pet_id", checkToken, PetController.deletePet)
 
 module.exports = router
