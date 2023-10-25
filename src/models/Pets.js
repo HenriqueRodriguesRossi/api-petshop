@@ -5,6 +5,10 @@ const PetSchema = new mongoose.model({
         type: String,
         required: true
     },
+    species:{
+        type: String,
+        required: true
+    },
     race:{
         type: String,
         required: true
