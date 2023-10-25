@@ -5,7 +5,7 @@ const PetSchema = new mongoose.model({
         type: String,
         required: true
     },
-    species:{
+    specie:{
         type: String,
         required: true
     },
