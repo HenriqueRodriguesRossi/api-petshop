@@ -4,6 +4,7 @@ const captureErrorYup = require("../utils/captureErrorYup")
 const userValidate = require("../utils/userValidate")
 const petValidate = require("../utils/petValidate")
 const veterinarianValidate = require("../utils/veterinarianValidate")
+const consultationValidate = require("../utils/consultationValidate")
 
 exports.newConsultation = async (req, res)=>{
     try{
@@ -146,6 +147,33 @@ exports.alterUserConsultation = async (req, res)=>{
 
         return res.status(500).send({
             mensagem: "Erro ao alterar a consulta!"
+        })
+    }
+}
+
+exports.deleteAccount = async (req, res)=>{
+    try{
+        const user_id = req.params.user_id
+        const consultation_id = req.params.consultation_id
+    
+        const userValidate = await userValidate(user_id)
+        const consultationValidate = await consultationValidate(consultation_id)
+    
+        if(user_id !== consultation_id.owner_id){
+            return res.status(422).send({
+                mensagem: "Apenas quem agendou a consulta pode excluí-la!"
+            })
+        }
+    
+        const deleteConsultation = await Consultation.findByIdAndDelete({_id: consultation_id})
+    
+        return res.status(200).send({
+            mensagem: "Consulta excluída com sucesso!"
+        })
+    }catch(error){
+        console.log(error)
+        return res.status(500).send({
+            mensagem: "Erro ao deletar consulta!"
         })
     }
 }
