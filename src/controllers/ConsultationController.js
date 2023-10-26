@@ -115,6 +115,14 @@ exports.alterUserConsultation = async (req, res)=>{
                 mensagem: "Pelo menos um dos campos deve ser preencher!"
             })
         }
+
+        const checkHour = await Consultation.findOne({veterinarian_id: consultation_id.veterinarian_id, date_of_consultation: new_date_of_consultation, hour_of_consultation: new_hour_of_consultation})
+        
+        if(checkHour){
+            return res.status(422).send({
+                mensagem: "Horário indisponível!"
+            })
+        }
     
         const consultationValidate = await Consultation.findByIdAndUpdate({
             _id: consultation_id, 
@@ -129,14 +137,6 @@ exports.alterUserConsultation = async (req, res)=>{
                 mensagem: "Nenhuma consulta foi encontrada!"
             })
         }
-
-        /*const checkHour = await Consultation.findOne({owner_id, })
-        
-        if(checkHour){
-            return res.status(422).send({
-                mensagem: "Poxa, esse veterinário não tem mais esse horário disponível!"
-            })
-        }*/
         
         return res.status(200).send({
             mensagem: "Consulta alterada com sucesso!"
