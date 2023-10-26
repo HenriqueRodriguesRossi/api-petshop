@@ -16,4 +16,4 @@ async function userValidate(id){
     }
 }
 
-module.exports = userValidate()
+module.exports = userValidate

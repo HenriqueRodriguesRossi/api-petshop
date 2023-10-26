@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const PetSchema = new mongoose.model({
+const PetSchema = new mongoose.Schema({
     name:{
         type: String,
         required: true
@@ -14,7 +14,7 @@ const PetSchema = new mongoose.model({
         required: true
     },
     years:{
-        type: Number,
+        type: String,
         required: true
     },
     owner_id:{
