@@ -9,6 +9,10 @@ const ConsultationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    veterinarian_id:{
+        type: String,
+        required: true
+    },
     date_of_consultation:{
         type: Date,
         required: true
