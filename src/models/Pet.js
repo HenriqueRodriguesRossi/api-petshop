@@ -24,7 +24,11 @@ const PetSchema = new mongoose.Schema({
     created_at:{
         type: Date,
         default: new Date()
-    }
-})
+    },
+    owner_id: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+}, {versionKey:false})
 
 module.exports = mongoose.model("Pet", PetSchema)

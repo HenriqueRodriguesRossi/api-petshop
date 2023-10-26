@@ -20,7 +20,7 @@ const veterinarianSchema = new mongoose.Schema({
     created_at:{
         type: Date,
         default: new Date()
-    }
-})
+    },
+}, {versionKey: false})
 
 module.exports = mongoose.model("Veterinarian", veterinarianSchema)

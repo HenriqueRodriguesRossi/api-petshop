@@ -28,7 +28,19 @@ const ConsultationSchema = new mongoose.Schema({
     created_at:{
         type: Date,
         default: new Date()
-    }
-})
+    },
+    owner_id: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    pet_id: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Pet"
+    }],
+    veterinarian_id: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Veterinarian"
+    }]
+}, {versionKey: false})
 
 module.exports = mongoose.model("Consultation", ConsultationSchema)

@@ -11,8 +11,6 @@ async function userValidate(id){
         return res.status(404).send({
             mensagem: "Nenhum usuário com esse id encontrado!"
         })
-    }else {
-        return true
     }
 }
 
