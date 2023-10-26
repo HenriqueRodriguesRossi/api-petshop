@@ -27,4 +27,4 @@ const PetSchema = new mongoose.model({
     }
 })
 
-module.exports = mongoose.model("Pets", PetSchema)
+module.exports = mongoose.model("Pet", PetSchema)

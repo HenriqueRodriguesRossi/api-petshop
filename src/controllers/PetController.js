@@ -1,4 +1,4 @@
-const Pet = require("../models/Pets")
+const Pet = require("../models/Pet")
 const userValidate = require("../utils/userValidate")
 const yup = require("yup")
 const captureErrorYup = require("../utils/captureErrorYup")

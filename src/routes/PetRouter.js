@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const PetController = require("../controllers/PetsController")
+const PetController = require("../controllers/PetController")
 const checkToken = require("../utils/checkToken")
 
 router.post("/pets/new/:user_id", checkToken,  PetController.newPet)
