@@ -1,10 +1,6 @@
 const Consultation = require("../models/Consultation")
 const yup = require("yup")
 const captureErrorYup = require("../utils/captureErrorYup")
-const userValidate = require("../utils/userValidate")
-const petValidate = require("../utils/petValidate")
-const veterinarianValidate = require("../utils/veterinarianValidate")
-const consultationValidate = require("../utils/consultationValidate")
 
 exports.newConsultation = async (req, res)=>{
     try{

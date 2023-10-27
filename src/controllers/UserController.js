@@ -3,7 +3,6 @@ const yup = require("yup")
 const captureErrorYup = require("../utils/captureErrorYup")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const userValidate = require("../utils/userValidate")
 
 exports.newUser = async (req, res) => {
     try {
