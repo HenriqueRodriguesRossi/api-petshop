@@ -1,7 +1,8 @@
 const router = require("express").Router()
 const checkToken = require("../utils/checkToken")
+const VeterinarianController = require("../controllers/VeterinarianController")
 
-router.post("/veterinarian/new")
+router.post("/veterinarian/new", VeterinarianController.newVeterinarian)
 
 router.get("/veterinarian/find/all", checkToken)
 router.get("/veterinarian/find/:veterinarian_id", checkToken, )
