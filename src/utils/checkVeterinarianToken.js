@@ -1,31 +1,28 @@
 const jwt = require("jsonwebtoken");
 
-function checkToken(req, res, next) {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+function checkVeterinarianToken(req, res, next) {
+     const authHeader = req.headers["authorization"];
+     const token = authHeader && authHeader.split(" ")[1];
 
-    if (!token) {
-        return res.status(401).json({ 
-            erro: "Apenas veterinários podem fazer esta operação!" 
-        });
-    }
+     if (!token) {
+         return res.status(401).json({
+             error: "Only veterinarians can perform this operation!"
+         });
+     }
 
-    try {
-        const veterinarianSecret = process.env.VETERINARIAN_SECRET;
+     try {
+         const veterinarianSecret = process.env.VETERINARIAN_SECRET;
 
-        // Verifique e decodifique o token
-        const decoded = jwt.verify(token, veterinarianSecret);
+         const decoded = jwt.verify(token, veterinarianSecret);
 
-        // Adicione as informações do usuário decodificadas ao objeto de solicitação
-        req.veterinarian = decoded;
+         req.veterinarian = decoded;
 
-        // Continue para a próxima middleware
-        next();
-    } catch (err) {
-        return res.status(401).json({ 
-            erro: "Token inválido ou expirado!" 
-        });
-    }
+         next();
+     } catch (err) {
+         return res.status(401).json({
+             error: "Invalid or expired token!"
+         });
+     }
 }
 
-module.exports = checkToken;
+module.exports = checkVeterinarianToken;
