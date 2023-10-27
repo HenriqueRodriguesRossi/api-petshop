@@ -1,13 +1,23 @@
 const Pet = require("../models/Pet")
-const userValidate = require("../utils/userValidate")
+const User = require("../models/User")
 const yup = require("yup")
 const captureErrorYup = require("../utils/captureErrorYup")
 
 exports.newPet = async (req, res) => {
     try {
-        const user_id = req.params
+        const id = req.params.id
 
-        await userValidate(user_id)
+        const userValidate = await User.findById({ _id: id })
+
+        if (!id) {
+            return res.status(400).send({
+                mensagem: "Nenhum id encontrado!"
+            })
+        } else if (!userValidate) {
+            return res.status(404).send({
+                mensagem: "Nenhum usuário com esse id encontrado!"
+            })
+        }
 
         const { name, specie, race, years } = req.body
 
@@ -28,7 +38,7 @@ exports.newPet = async (req, res) => {
             specie,
             race,
             years,
-            owner_id: user_id
+            owner_id: id
         })
 
         await newPet.save()
@@ -78,22 +88,25 @@ exports.findAll = async (req, res) => {
     }
 }
 
-exports.findRice = async (req, res) => {
+exports.findRace = async (req, res) => {
     try {
-        const user_id = req.params
-        const rice = req.body
+        const { race } = req.body
 
-        await userValidate(user_id)
+        if (!race) {
+            return res.status(400).send({
+                mensagem: "Digite o nome de uma raça!"
+            })
+        }
 
-        const riceVerify = await Pet.find({ rice })
+        const raceVerify = await Pet.find({ race })
 
-        if (!riceVerify) {
+        if (!raceVerify || raceVerify.length == 0) {
             return res.status(404).send({
                 mensagem: "Essa raça não foi cadastrada!"
             })
         } else {
             return res.status(200).send({
-                mensagem: riceVerify
+                mensagem: raceVerify
             })
         }
     } catch (error) {
@@ -107,10 +120,13 @@ exports.findRice = async (req, res) => {
 
 exports.findSpecie = async (req, res) => {
     try {
-        const user_id = req.params
-        const specie = req.body
+        const {specie} = req.body
 
-        await userValidate(user_id)
+        if (!specie) {
+            return res.status(404).send({
+                mensagem: "Digite o nome de uma espécie!"
+            })
+        }
 
         const specieVerify = await Pet.find({ specie })
 
@@ -118,11 +134,12 @@ exports.findSpecie = async (req, res) => {
             return res.status(404).send({
                 mensagem: "Essa espécie não foi cadastrada!"
             })
-        } else {
-            return res.status(200).send({
-                mensagem: specieVerify
-            })
-        }
+        } 
+        
+        return res.status(200).send({
+            sucesso: "Pesquisa efetuada com sucesso!",
+            mensagem: specieVerify
+        })
     } catch (error) {
         console.log(error)
 
@@ -134,7 +151,7 @@ exports.findSpecie = async (req, res) => {
 
 exports.findPetById = async (req, res) => {
     try {
-        const pet_id = req.params.pet_id
+        const {pet_id} = req.params.pet_id
 
         const petVerify = await Pet.findById({ _id: pet_id })
 
@@ -158,9 +175,21 @@ exports.findPetById = async (req, res) => {
 
 exports.findPetByUser = async (req, res) => {
     try {
-        const user_id = req.params
+        const {user_id} = req.params
 
-        await userValidate(user_id)
+        if(!user_id){
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do usuário!"
+            })
+        }
+
+        const validateUserId = await User.findById({_id: user_id})
+
+        if(!validateUserId){
+            return res.status(404).send({
+                mensagem: "Nenhum usuário foi encontrado com esse id!"
+            })
+        }
 
         const petVerify = await Pet.find({ owner_id: user_id })
 
@@ -184,52 +213,27 @@ exports.findPetByUser = async (req, res) => {
 
 exports.alterPet = async (req, res) => {
     try {
-        const user_id = req.params.user_id
+        const {user_id, pet_id} = req.params
 
-        await userValidate(user_id)
-
-        const pet_id = req.params.pet_id
-
-        if (!pet_id) {
+        if(!user_id || !pet_id){
             return res.status(400).send({
-                mensagem: "Forneça o id do pet!"
+                mensagem: "Por favor, forneça todas as informações necessárias!"
             })
         }
 
         const { name, specie, race, years } = req.body
 
-        const updatePetSchema = yup.object().shape({
-            name: yup.string().min(3, "O nome do animal deve ter no mínimo 3 caracteres!"),
-
-            specie: yup.string("Digite uma espécie válida!"),
-
-            race: yup.string().required("A raça do animal é obrigatória!"),
-
-            years: yup.number()
-        })
-
-        await updatePetSchema.validate(req.body, { abortEarly: false })
-
         const updatedFields = {}
 
-        if (name) {
-            updatedFields.name = name
-        }
-
-        if (specie) {
-            updatedFields.specie = specie
-        }
-
-        if (race) {
-            updatedFields.race = race
-        }
-
-        if (years) {
-            updatedFields.years = years
-        }else{
+        if (!name && !specie && !race && !years) {
             return res.status(400).send({
                 mensagem: "Por favor, digite o campo que você deseja alterar!"
             })
+        }else{
+            updatedFields.name = name
+            updatedFields.specie = specie
+            updatedFields.race = race
+            updatedFields.years = years
         }
 
         const updatedPet = await Pet.findByIdAndUpdate(
@@ -266,16 +270,13 @@ exports.alterPet = async (req, res) => {
     }
 }
 
-exports.deletePet = async (req, res)=>{
-    try{
-        const user_id = req.params.user_id
-        const pet_id = req.params.pet_id
-    
-        await userValidate(user_id)
-    
-        if(!pet_id){
+exports.deletePet = async (req, res) => {
+    try {
+        const {user_id, pet_id} = req.params
+
+        if(!user_id || !pet_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do pet!"
+                mensagem: "Por favor, forneça todas as informações necessárias!"
             })
         }
 
@@ -284,16 +285,17 @@ exports.deletePet = async (req, res)=>{
             owner_id: user_id
         })
 
-        if(!deletePet){
+        if (!deletePet) {
             return res.status(404).send({
                 mensagem: "Nenhum animal foi encontrado!"
             })
-        }else{
+        } else {
             return res.status(200).send({
-                mensagem: "Pet excuído com sucesso!"
+                mensagem: "Pet excuído com sucesso!",
+                pet_detail: deletePet
             })
         }
-    }catch(error){
+    } catch (error) {
         console.log(error)
         return res.status(500).send({
             mensagem: "Erro ao excluir o pet!"
