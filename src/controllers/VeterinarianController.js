@@ -2,6 +2,7 @@ const Veterinarian = require("../models/Veterinarian")
 const yup = require("yup")
 const bcrypt = require("bcryptjs")
 const captureErrorYup = require("../utils/captureErrorYup")
+const Consultation = require("../models/Consultation")
 
 exports.newVeterinarian = async (req, res) => {
     try {
@@ -152,6 +153,41 @@ exports.findVeterinarianByName = async (req, res) => {
 
         return res.status(500).send({
             mensagem: "Erro ao efetuar a pesquisa do veterinário!"
+        })
+    }
+}
+
+exports.findTodayConsultation = async (req, res)=>{
+    try{
+        const {veterinarian_id} = req.params.veterinarian_id
+
+        if(!veterinarian_id){
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do veterinário!"
+            })
+        }
+
+        const verifyVeterinarianConsultation = await Consultation.find({veterinarian_id})
+
+        const gettingDataQuery = verifyVeterinarianConsultation.date_of_consultation
+        
+        if(!gettingDataQuery == new Date()){
+            return res.status(404).send({
+                mensagem: "Você não tem nenhuma consulta marcada para hoje!"
+            })
+        }else{
+            const consultations = [gettingDataQuery]
+
+            return res.status(200).send({
+                mensagem: "Listagem das consultas de hoje concluída!",
+                consultations_details: consultations
+            })
+        }
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao buscar as consultas de hoje!"
         })
     }
 }
