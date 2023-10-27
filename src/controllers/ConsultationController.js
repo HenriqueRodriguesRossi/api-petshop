@@ -177,3 +177,109 @@ exports.deleteAccount = async (req, res)=>{
         })
     }
 }
+
+exports.findPetConsultation = async (req, res)=>{
+    try{
+        const pet_id = req.params.pet_id
+
+        await petValidate(pet_id)
+
+        const findConsultation = await Consultation.findById({_id: pet_id})
+
+        if(!findConsultation){
+            return res.status(404).send({
+                mensagem: "Este animal não tem nenhuma consulta marcada!"
+            })
+        }else {
+            return res.status(200).send({
+                mensagem: "Sucesso!",
+                consultation_details: findConsultation
+            })
+        }
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao listar usuários!"
+        })
+    }
+}
+
+exports.alterPetConsultation = async (req, res)=>{
+    try{
+        const pet_id = req.params.pet_id
+        const consultation_id = req.params.consultation_id
+
+        await petValidate(pet_id)
+
+        if(!consultation_id){
+            return res.status(400).send({
+                mensagem: "Id da consulta deve ser fornecido!"
+            })
+        }
+
+        const {new_date_of_consultation, new_hour_of_consultation, new_comments} = req.body
+
+        if(!new_date_of_consultation && !new_hour_of_consultation && !new_comments){
+            return res.status(400).send({
+                mensagem: "Pelo menos um dos campos deve ser preencher!"
+            })
+        }
+
+        const checkHour = await Consultation.findOne({
+            veterinarian_id: consultation_id.veterinarian_id, 
+            date_of_consultation: new_date_of_consultation, hour_of_consultation: new_hour_of_consultation})
+        
+        if(checkHour){
+            return res.status(422).send({
+                mensagem: "Horário indisponível!"
+            })
+        }
+    
+        const newConsultation = await Consultation.findByIdAndUpdate({
+            _id: consultation_id,
+            date_of_consultation: new_date_of_consultation,
+            hour_of_consultation: new_hour_of_consultation,
+            comments: new_comments
+        })
+
+        if(!newConsultation){
+            return res.status(404).send({
+                mensagem: "Nenhuma consulta foi encontrada!"
+            })
+        }
+        
+        return res.status(200).send({
+            mensagem: "Consulta alterada com sucesso!",
+            consultatiion_info: newConsultation
+        })
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao alterar a consulta!"
+        })
+    }
+}
+
+exports.deletePetAccount = async (req, res)=>{
+    try{
+        const pet_id = req.params.pet_id
+        const consultation_id = req.params.consultation_id
+    
+        await petValidate(pet_id)
+        await consultationValidate(consultation_id)
+    
+        const deleteConsultation = await Consultation.findByIdAndDelete({_id: consultation_id})
+    
+        return res.status(200).send({
+            mensagem: "Consulta excluída com sucesso!",
+            infos: deleteConsultation
+        })
+    }catch(error){
+        console.log(error)
+        return res.status(500).send({
+            mensagem: "Erro ao deletar consulta!"
+        })
+    }
+}
