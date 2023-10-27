@@ -141,7 +141,7 @@ exports.findVeterinarianByName = async (req, res) => {
             return res.status(404).send({
                 mensagem: "Nenhum veterinário encontrado!"
             })
-        }else{
+        } else {
             return res.status(200).send({
                 mensagem: "Pesquisa efetuada com sucesso!",
 
@@ -157,25 +157,25 @@ exports.findVeterinarianByName = async (req, res) => {
     }
 }
 
-exports.findTodayConsultation = async (req, res)=>{
-    try{
-        const {veterinarian_id} = req.params.veterinarian_id
+exports.findTodayConsultation = async (req, res) => {
+    try {
+        const { veterinarian_id } = req.params.veterinarian_id
 
-        if(!veterinarian_id){
+        if (!veterinarian_id) {
             return res.status(400).send({
                 mensagem: "Por favor, forneça o id do veterinário!"
             })
         }
 
-        const verifyVeterinarianConsultation = await Consultation.find({veterinarian_id})
+        const verifyVeterinarianConsultation = await Consultation.find({ veterinarian_id })
 
         const gettingDataQuery = verifyVeterinarianConsultation.date_of_consultation
-        
-        if(!gettingDataQuery == new Date()){
+
+        if (!gettingDataQuery == new Date()) {
             return res.status(404).send({
                 mensagem: "Você não tem nenhuma consulta marcada para hoje!"
             })
-        }else{
+        } else {
             const consultations = [gettingDataQuery]
 
             return res.status(200).send({
@@ -183,7 +183,7 @@ exports.findTodayConsultation = async (req, res)=>{
                 consultations_details: consultations
             })
         }
-    }catch(error){
+    } catch (error) {
         console.log(error)
 
         return res.status(500).send({
@@ -192,29 +192,95 @@ exports.findTodayConsultation = async (req, res)=>{
     }
 }
 
-exports.findAllConsultations = async (req, res)=>{
-    try{
-        const {veterinarian_id} = req.params.veterinarian_id
+exports.findAllConsultations = async (req, res) => {
+    try {
+        const { veterinarian_id } = req.params.veterinarian_id
+
+        if (!veterinarian_id) {
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do veterinário!"
+            })
+        }
 
         const findingAllConsultation = await Consultation.find({
             veterinarian_id
         })
 
-        if(!findingAllConsultation){
+        if (!findingAllConsultation) {
             return res.status(404).send({
                 mensagem: "Nenhuma consulta encontrada!"
             })
-        }else{
+        } else {
             return res.status(200).send({
                 mensagem: "Aqui estão as suas consultas:",
                 consultations_details: findingAllConsultation
             })
         }
-    }catch(error){
+    } catch (error) {
         console.log(error)
 
         return res.status(500).send({
             mensagem: "Erro ao retornar as consultas!"
+        })
+    }
+}
+
+exports.alterVeterinarianInfos = async (req, res) => {
+    try {
+        const { veterinarian_id } = req.params.veterinarian_id
+
+        if (!veterinarian_id) {
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do veterinário!"
+            })
+        }
+
+        const { new_full_name, new_cfmv, new_college_graduated, new_specialty, new_professional_email, new_password } = req.body
+
+        if (!new_full_name && !new_cfmv && !new_college_graduated && !new_specialty && !new_professional_email && !new_password) {
+            return res.status(400).send({
+                mensagem: "Preencha pelo menos um dos campos!"
+            })
+        }
+
+        if (new_password) {
+            const newPasswordHash = await bcrypt.hash(new_password, 20)
+        }
+
+        const updatedFields = [
+            new_full_name,
+            new_cfmv,
+            new_college_graduated,
+            new_specialty,
+            new_professional_email,
+        ]
+
+        const updatingVeterinarianInfos = await Veterinarian.findByIdAndUpdate({
+            _id: veterinarian_id,
+            full_name: updatedFields.new_full_name,
+            cfmv: updatedFields.new_cfmv,
+            college_graduated: updatedFields.new_college_graduated,
+            specialty: updatedFields.new_specialty,
+            professional_email: updatedFields.new_professional_email,
+            password: newPasswordHash
+        })
+
+        if (!updatingVeterinarianInfos) {
+            return res.status(404).send({
+                mensagem: "Nenhum veterinário enconterado!"
+            })
+        } else {
+            return res.status(200).send({
+                mensagem: "Informações alteradas com sucesso!",
+
+                veterinarian_details: updatingVeterinarianInfos
+            })
+        }
+    } catch (error) {
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao alterar as informações!"
         })
     }
 }

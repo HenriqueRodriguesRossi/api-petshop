@@ -10,7 +10,7 @@ router.get("/veterinarian/find/veterinarian_name", checkToken, VeterinarianContr
 router.get("/veterinarian/find/consultation/today/:veterinarian_id", checkToken, VeterinarianController.findTodayConsultation)
 router.get("/veterinarian/find/consultation/all/:veterinarian_id", checkToken, VeterinarianController.findAllConsultations)
 
-router.put("/veterinarian/alter/:veterinarian_id", checkToken, )
+router.put("/veterinarian/alter/:veterinarian_id", checkToken, VeterinarianController.alterVeterinarianInfos)
 
 router.delete("/veterinarian/delete/:veterinarian_id", checkToken, )
 
