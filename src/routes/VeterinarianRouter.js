@@ -12,6 +12,6 @@ router.get("/veterinarian/find/consultation/all/:veterinarian_id", checkToken, V
 
 router.put("/veterinarian/alter/:veterinarian_id", checkToken, VeterinarianController.alterVeterinarianInfos)
 
-router.delete("/veterinarian/delete/:veterinarian_id", checkToken, )
+router.delete("/veterinarian/delete/:veterinarian_id", checkToken, VeterinarianController.deleteVeterinarianAccount)
 
 module.exports = router

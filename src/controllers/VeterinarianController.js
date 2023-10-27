@@ -243,9 +243,8 @@ exports.alterVeterinarianInfos = async (req, res) => {
             })
         }
 
-        if (new_password) {
-            const newPasswordHash = await bcrypt.hash(new_password, 20)
-        }
+
+        const newPasswordHash = await bcrypt.hash(new_password, 20)
 
         const updatedFields = [
             new_full_name,
@@ -253,6 +252,7 @@ exports.alterVeterinarianInfos = async (req, res) => {
             new_college_graduated,
             new_specialty,
             new_professional_email,
+            newPasswordHash
         ]
 
         const updatingVeterinarianInfos = await Veterinarian.findByIdAndUpdate({
@@ -262,7 +262,7 @@ exports.alterVeterinarianInfos = async (req, res) => {
             college_graduated: updatedFields.new_college_graduated,
             specialty: updatedFields.new_specialty,
             professional_email: updatedFields.new_professional_email,
-            password: newPasswordHash
+            password: updatedFields.newPasswordHash
         })
 
         if (!updatingVeterinarianInfos) {
@@ -281,6 +281,35 @@ exports.alterVeterinarianInfos = async (req, res) => {
 
         return res.status(500).send({
             mensagem: "Erro ao alterar as informações!"
+        })
+    }
+}
+
+exports.deleteVeterinarianAccount = async (req, res) => {
+    try {
+        const { veterinarian_id } = req.params.veterinarian_id
+
+        if (!veterinarian_id) {
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do veterinário!"
+            })
+        }
+
+        const deleteVeterinarianAccount = await Veterinarian.findByIdAndDelete({ _id: veterinarian_id })
+
+        if (!deleteVeterinarianAccount) {
+            return res.status(404).send({
+                mensagem: "Nenhum veterinário encontrado!"
+            })
+        } else {
+            return res.status(200).send({
+                mensagem: "Conta deletada com sucesso!"
+            })
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({
+            mensagem: "Erro ao excluír conta!"
         })
     }
 }
