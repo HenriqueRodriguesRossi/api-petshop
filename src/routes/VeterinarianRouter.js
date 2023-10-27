@@ -3,6 +3,7 @@ const checkToken = require("../utils/checkToken")
 const VeterinarianController = require("../controllers/VeterinarianController")
 
 router.post("/veterinarian/new", VeterinarianController.newVeterinarian)
+router.post("/veterinarian/login", VeterinarianController.veterinarianLogin)
 
 router.get("/veterinarian/find/all", checkToken, VeterinarianController.findAll)
 router.get("/veterinarian/find/:veterinarian_id", checkToken, VeterinarianController.findVeterinarianById)

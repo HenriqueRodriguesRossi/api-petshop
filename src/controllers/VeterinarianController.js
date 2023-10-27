@@ -3,44 +3,47 @@ const yup = require("yup")
 const bcrypt = require("bcryptjs")
 const captureErrorYup = require("../utils/captureErrorYup")
 const Consultation = require("../models/Consultation")
+const jwt = require("jsonwebtoken")
 
 exports.newVeterinarian = async (req, res) => {
     try {
         const { full_name, cfmv, college_graduated, specialty, professional_email, password, repeate_password } = req.body
 
         const VeterinarianSchema = yup.object().shape({
-            full_name: yup.string().require("O nome do veterinário é obrigatório!"),
+            full_name: yup.string().required("O nome do veterinário é obrigatório!"),
 
-            cfmv: yup.string().require("O seu cfmv é obrigatório!"),
+            cfmv: yup.string().required("O seu cfmv é obrigatório!"),
 
-            college_graduated: yup.string().require("O nome da faculdade é obrigatório!"),
+            college_graduated: yup.string().required("O nome da faculdade é obrigatório!"),
 
-            specialty: yup.string().require("Fornecer sua especialidade é obrigatório!"),
+            specialty: yup.string().required("Fornecer sua especialidade é obrigatório!"),
 
-            professional_email: yup.string().email("Digite um email válido!").require("O seu email profissional é obrigatório!"),
+            professional_email: yup.string().email("Digite um email válido!").required("O seu email profissional é obrigatório!"),
 
-            password: yup.string().require("A senha é obrigatória!").min(6, "A senha deve ter no mínimo 6 caracteres!").max(30, "A senha deve ter no máximo 30 caracteres!"),
+            password: yup.string().required("A senha é obrigatória!").min(6, "A senha deve ter no mínimo 6 caracteres!").max(30, "A senha deve ter no máximo 30 caracteres!"),
 
             repeate_password: yup.string().required("A confirmação da senha é obrigatória!").oneOf([password, null], "As senhas devem ser iguais!")
         })
 
         await VeterinarianSchema.validate(req.body, { abortEarly: false })
 
-        const professionalEmailValidate = await Veterinarian.findOne({ email })
-
-        const cfmvValidate = await Veterinarian.findOne({ cfmv })
+        const professionalEmailValidate = await Veterinarian.findOne({ professional_email })
 
         if (professionalEmailValidate) {
             return res.status(422).send({
                 mensagem: "Este email já foi cadastrado!"
             })
-        } else if (cfmvValidate) {
+        }
+
+        const cfmvValidate = await Veterinarian.findOne({ cfmv })
+
+        if (cfmvValidate) {
             return res.status(422).send({
                 mensagem: "Este cfmv já foi cadastrado!"
             })
         }
 
-        const passwordHash = await bcrypt.hash(password, 20)
+        const passwordHash = await bcrypt.hash(password, 10)
 
         const newVeterinarian = new Veterinarian({
             full_name,
@@ -52,6 +55,8 @@ exports.newVeterinarian = async (req, res) => {
         })
 
         await newVeterinarian.save()
+
+        console.log("Veterinário salvo!")
 
         return res.status(201).send({
             mensagem: "Veterinário cadastrado com sucesso!",
@@ -310,6 +315,46 @@ exports.deleteVeterinarianAccount = async (req, res) => {
         console.log(error)
         return res.status(500).send({
             mensagem: "Erro ao excluír conta!"
+        })
+    }
+}
+
+exports.veterinarianLogin = async (req, res)=>{
+    try{
+        const {professional_email, cfmv, password} = req.body
+
+        if(!professional_email || !cfmv || !password){
+            return res.status(400).send({
+                mensagem: "Por favor, digite todas as informações!"
+            })
+        }
+
+        const checkIfVeterinarianExists = await Veterinarian.findOne({professional_email, cfmv})
+
+        const checkPassword = await bcrypt.compare(password, checkIfVeterinarianExists.password)
+
+        if(!checkIfVeterinarianExists || !checkPassword){
+            return res.status(422).send({
+                mensagem: "Por favor, digite todas as informações corretas!"
+            })
+        }
+
+        const veterinarianSecret = process.env.VETERINARIAN_SECRET
+
+        const token = jwt.sign({
+            _id: checkIfVeterinarianExists.id
+        }, veterinarianSecret)
+
+        return res.status(200).send({
+            mensagem: "Login efetuado com sucesso!",
+            token: token,
+            veterinarian_id: checkIfVeterinarianExists.id
+        })
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao efetuar o login!"
         })
     }
 }
