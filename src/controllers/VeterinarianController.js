@@ -120,3 +120,38 @@ exports.findVeterinarianById = async (req, res) => {
         })
     }
 }
+
+exports.findVeterinarianByName = async (req, res) => {
+    try {
+        const { name } = req.body
+
+        if (!name) {
+            return res.status(400).send({
+                mensagem: "Por favor, digite o nome do veterinário que deseja pesquisar!"
+            })
+        }
+
+        const nameRegex = new RegExp({ name })
+
+        const findingVeterinarian = await
+            Veterinarian.find({ full_name: nameRegex })
+
+        if (!findingVeterinarian) {
+            return res.status(404).send({
+                mensagem: "Nenhum veterinário encontrado!"
+            })
+        }else{
+            return res.status(200).send({
+                mensagem: "Pesquisa efetuada com sucesso!",
+
+                veterinarian_details: findingVeterinarian
+            })
+        }
+    } catch (error) {
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao efetuar a pesquisa do veterinário!"
+        })
+    }
+}
