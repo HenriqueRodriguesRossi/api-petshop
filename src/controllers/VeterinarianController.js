@@ -191,3 +191,30 @@ exports.findTodayConsultation = async (req, res)=>{
         })
     }
 }
+
+exports.findAllConsultations = async (req, res)=>{
+    try{
+        const {veterinarian_id} = req.params.veterinarian_id
+
+        const findingAllConsultation = await Consultation.find({
+            veterinarian_id
+        })
+
+        if(!findingAllConsultation){
+            return res.status(404).send({
+                mensagem: "Nenhuma consulta encontrada!"
+            })
+        }else{
+            return res.status(200).send({
+                mensagem: "Aqui estão as suas consultas:",
+                consultations_details: findingAllConsultation
+            })
+        }
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao retornar as consultas!"
+        })
+    }
+}
