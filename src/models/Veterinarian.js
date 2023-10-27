@@ -5,15 +5,23 @@ const veterinarianSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    professional_email:{
-        type: String,
-        required: true
-    },
     cfmv:{
         type: String,
         required: true
     },
     college_graduated:{
+        type: String,
+        required: true
+    },
+    specialty:{
+        type: String,
+        required: true
+    },
+    professional_email:{
+        type: String,
+        required: true
+    },
+    password:{
         type: String,
         required: true
     },
