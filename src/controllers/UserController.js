@@ -221,3 +221,87 @@ exports.alterEmail = async (req, res) => {
         })
     }
 }
+
+exports.findUserById = async (req, res)=>{
+    try{
+        const {user_id} = req.params
+
+        if(!user_id){
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do usuário!"
+            })
+        }
+
+        const findUserById = await User.findById({
+            _id: user_id
+        })
+
+        if(!findUserById){
+            return res.status(404).send({
+                mensagem: "Nenhum usuário foi encontrado!"
+            })
+        }else{
+            return res.status(200).send({
+                mensagem: "Usuário encontrado com sucesso!",
+
+                user_details: findUserById
+            })
+        }
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao pesquisar o usuário!"
+        })
+    }
+}
+
+exports.findUserByName = async(req, res)=>{
+    try{
+        const {first_name} = req.body
+
+        if(!first_name){
+            return res.status(400).send({
+                mensagem: "Por favor, digite o primeiro nome do usuário!"
+            })
+        }
+    
+        const findUserByFirstName = await User.find({
+            first_name
+        })
+    
+        if(!findUserByFirstName || findUserByFirstName.length == 0){
+            return res.status(404).send({
+                mensagem: "Nenhum usuário encontrado!"
+            })
+        }else{
+            return res.status(200).send({
+                results: findUserByFirstName
+            })
+        }
+    }catch(error){
+        console.log(error)
+
+        return res.status(500).send({
+            mensagem: "Erro ao pesquisar os usuários!"
+        })
+    }
+}
+
+exports.findAllUsers = async (req, res)=>{
+    try{
+        const findAllUsers = await User.find()
+
+        if(!findAllUsers || findAllUsers.length == 0){
+            return res.status(404).send({
+                mensagem: "Nenhum usuário encontrado!"   
+            })
+        }else{
+            return res.status(200).send({
+                results: findAllUsers
+            })
+        }
+    }catch(error){
+        console.log(error)
+    }
+}
