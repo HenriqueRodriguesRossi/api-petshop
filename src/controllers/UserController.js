@@ -106,11 +106,21 @@ exports.login = async (req, res) => {
 
 exports.deleteAccount = async (req, res) => {
     try {
-        const user_id = req.params.user_id
+        const {user_id} = req.params
 
-        await userValidate(user_id)
+        if(!user_id){
+            return res.status(400).send({
+                mensagem: "Por favor, forneça o id do usuário!"
+            })
+        }
 
         const deleteAccount = await User.findByIdAndDelete({ _id: user_id })
+
+        if(!deleteAccount){
+            return res.status(404).send({
+                mensagem: "Nenhuma conta encontrado!"
+            })
+        }
 
         return res.status(200).send({
             mensagem: "Conta excluída com sucesso!",
@@ -133,11 +143,11 @@ exports.alterPass = async (req, res) => {
 
         const { new_pass } = req.body
 
-        if(!new_pass){
+        if (!new_pass) {
             return res.status(400).send({
                 mensagem: "Digite a sua nova senha!"
             })
-        }else if(new_pass.length < 6){
+        } else if (new_pass.length < 6) {
             return res.status(422).send({
                 mensagem: "A senha deve ter no mínimo 6 caracteres!"
             })
@@ -165,41 +175,39 @@ exports.alterPass = async (req, res) => {
 
 exports.alterEmail = async (req, res) => {
     try {
-        const user_id = req.params.user_id
+        const { user_id } = req.params
 
-        if (userValidate(user_id)) {
-            const { new_email } = req.body
+        const { new_email } = req.body
 
-            const emailValidate = yup.object().shape({
-                new_email: yup.string().required("O novo email é obrigatório!").email("Digitr um email válido!")
+        const emailValidate = yup.object().shape({
+            new_email: yup.string().required("O novo email é obrigatório!").email("Digitr um email válido!")
+        })
+
+        await emailValidate.validate(req.body, { abortEarly: false })
+
+        const checkIfEmailExists = await User.findOne({
+            _id: user_id,
+            email: new_email
+        })
+
+        if (checkIfEmailExists) {
+            return res.status(422).send({
+                mensagem: "Este já é o email que consta em sistema, por isso, não foi alterado!"
             })
-
-            await emailValidate.validate(req.body, {abortEarly: false})
-
-            const checkIfEmailExists = await User.findOne({
+        } else {
+            const newUserEmail = await User.findByIdAndUpdate({
                 _id: user_id,
                 email: new_email
             })
 
-            if(checkIfEmailExists){
-                return res.status(422).send({
-                    mensagem: "Este já é o email que consta em sistema, por isso, não foi alterado!"
-                })
-            }else{
-                const newUserEmail = await User.findByIdAndUpdate({
-                    _id: user_id,
-                    email: new_email
-                })
-    
-                await newUserEmail.save()
-    
-                return res.status(200).send({
-                    mensagem: "Email alterado com sucesso!"
-                })
-            }
+            await newUserEmail.save()
+
+            return res.status(200).send({
+                mensagem: "Email alterado com sucesso!"
+            })
         }
     } catch (error) {
-        if(error instanceof yup.ValidationError){
+        if (error instanceof yup.ValidationError) {
             const errors = [captureErrorYup(error)]
             return res.status(422).send({
                 mensagem: "Erro ao alterar email!",
