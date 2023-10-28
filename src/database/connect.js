@@ -5,12 +5,12 @@ mongoose.connect(mongoUri)
 
 const connection = mongoose.connection
 
-connection.on("open", ()=>{
-    console.log("Conectado com sucesso ao banco de dados!")
+connection.on("open", () => {
+    console.log("Successfully connected to the database!")
 })
 
-connection.on("error", (error)=>{
-    console.log("Erro ao conectar com o banco: " + error)
+connection.on("error", (error) => {
+    console.log("Error connecting to the bank: " + error)
 })
 
 module.exports = mongoose

@@ -110,7 +110,7 @@ exports.deleteAccount = async (req, res) => {
 
         if(!user_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do usuário!"
+                message: "Please provide user id!"
             })
         }
 
@@ -118,19 +118,19 @@ exports.deleteAccount = async (req, res) => {
 
         if(!deleteAccount){
             return res.status(404).send({
-                mensagem: "Nenhuma conta encontrado!"
+                message: "No accounts found!"
             })
         }
 
         return res.status(200).send({
-            mensagem: "Conta excluída com sucesso!",
+            message: "Account deleted successfully!",
 
             details: deleteAccount
         })
     } catch (error) {
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao excluir a conta!"
+            message: "Error deleting account!"
         })
     }
 }
@@ -145,11 +145,11 @@ exports.alterPass = async (req, res) => {
 
         if (!new_pass) {
             return res.status(400).send({
-                mensagem: "Digite a sua nova senha!"
+                message: "Enter your new password!"
             })
         } else if (new_pass.length < 6) {
             return res.status(422).send({
-                mensagem: "A senha deve ter no mínimo 6 caracteres!"
+                message: "The password must be at least 6 characters long!"
             })
         }
 
@@ -163,12 +163,12 @@ exports.alterPass = async (req, res) => {
         await newUserPass.save()
 
         return res.status(200).send({
-            mensagem: "Senha alterada com sucesso!"
+            message: "Password changed successfully!"
         })
     } catch (error) {
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao alterar a senha!"
+            message: "Error changing password!"
         })
     }
 }
@@ -180,7 +180,7 @@ exports.alterEmail = async (req, res) => {
         const { new_email } = req.body
 
         const emailValidate = yup.object().shape({
-            new_email: yup.string().required("O novo email é obrigatório!").email("Digitr um email válido!")
+            new_email: yup.string().required("New email is required!").email("Please enter a valid email!")
         })
 
         await emailValidate.validate(req.body, { abortEarly: false })
@@ -192,7 +192,7 @@ exports.alterEmail = async (req, res) => {
 
         if (checkIfEmailExists) {
             return res.status(422).send({
-                mensagem: "Este já é o email que consta em sistema, por isso, não foi alterado!"
+                message: "This is already the email that appears in the system, so it has not been changed!"
             })
         } else {
             const newUserEmail = await User.findByIdAndUpdate({
@@ -203,21 +203,21 @@ exports.alterEmail = async (req, res) => {
             await newUserEmail.save()
 
             return res.status(200).send({
-                mensagem: "Email alterado com sucesso!"
+                message: "Email changed successfully!"
             })
         }
     } catch (error) {
         if (error instanceof yup.ValidationError) {
             const errors = [captureErrorYup(error)]
             return res.status(422).send({
-                mensagem: "Erro ao alterar email!",
-                erro: errors
+                message: "Error changing email!",
+                error: errors
             })
         }
 
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao alterar o email!"
+            message: "Error changing email!"
         })
     }
 }
@@ -228,7 +228,7 @@ exports.findUserById = async (req, res)=>{
 
         if(!user_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do usuário!"
+                message: "Please provide user id!"
             })
         }
 
@@ -238,11 +238,11 @@ exports.findUserById = async (req, res)=>{
 
         if(!findUserById){
             return res.status(404).send({
-                mensagem: "Nenhum usuário foi encontrado!"
+                message: "No users were found!"
             })
         }else{
             return res.status(200).send({
-                mensagem: "Usuário encontrado com sucesso!",
+                message: "User found successfully!",
 
                 user_details: findUserById
             })
@@ -251,7 +251,7 @@ exports.findUserById = async (req, res)=>{
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao pesquisar o usuário!"
+            message: "Error searching for user!"
         })
     }
 }
@@ -262,17 +262,17 @@ exports.findUserByName = async(req, res)=>{
 
         if(!first_name){
             return res.status(400).send({
-                mensagem: "Por favor, digite o primeiro nome do usuário!"
+                message: "Please enter the user's first name!"
             })
         }
-    
+   
         const findUserByFirstName = await User.find({
             first_name
         })
-    
+   
         if(!findUserByFirstName || findUserByFirstName.length == 0){
             return res.status(404).send({
-                mensagem: "Nenhum usuário encontrado!"
+                message: "No users found!"
             })
         }else{
             return res.status(200).send({
@@ -283,7 +283,7 @@ exports.findUserByName = async(req, res)=>{
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao pesquisar os usuários!"
+            message: "Error searching for users!"
         })
     }
 }
@@ -294,7 +294,7 @@ exports.findAllUsers = async (req, res)=>{
 
         if(!findAllUsers || findAllUsers.length == 0){
             return res.status(404).send({
-                mensagem: "Nenhum usuário encontrado!"   
+                message: "No users found!"
             })
         }else{
             return res.status(200).send({
@@ -303,5 +303,8 @@ exports.findAllUsers = async (req, res)=>{
         }
     }catch(error){
         console.log(error)
+        return res.status(500).send({
+            message: "Error searching all users!"
+        })
     }
 }

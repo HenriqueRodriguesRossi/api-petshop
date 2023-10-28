@@ -11,31 +11,31 @@ exports.newPet = async (req, res) => {
 
         if (!id) {
             return res.status(400).send({
-                mensagem: "Nenhum id encontrado!"
+                message: "No id found!"
             })
         } else if (!userValidate) {
             return res.status(404).send({
-                mensagem: "Nenhum usuário com esse id encontrado!"
+                message: "No user with this id found!"
             })
         }
 
-        const { name, specie, race, years } = req.body
+        const { name, species, race, years } = req.body
 
         const PetSchema = yup.object().shape({
-            name: yup.string().required("O nome do animal é obrigatório!").min(3, "O nome do animal deve ter no mínimo 3 caracteres!"),
+            name: yup.string().required("The animal's name is required!").min(3, "The animal's name must have at least 3 characters!"),
 
-            specie: yup.string().required("A espécie do animal é obrigatória!"),
+            specie: yup.string().required("Animal species is required!"),
 
-            race: yup.string().required("A raça do animal é obrigatória!"),
+            race: yup.string().required("The animal's breed is required!"),
 
-            years: yup.number().required("A idade do animal é obrigatória!")
+            years: yup.number().required("Animal age is required!")
         })
 
         await PetSchema.validate(req.body, { abortEarly: false })
 
         const newPet = new Pet({
             name,
-            specie,
+            species,
             race,
             years,
             owner_id: id
@@ -44,23 +44,23 @@ exports.newPet = async (req, res) => {
         await newPet.save()
 
         return res.status(201).send({
-            mensagem: "Pet cadastrado com sucesso!",
-            detalhes_novo_pet: newPet
+            message: "Pet registered successfully!",
+            details_new_pet: newPet
         })
     } catch (error) {
         if (error instanceof yup.ValidationError) {
             const errors = [captureErrorYup(error)]
 
             return res.status(422).send({
-                mensagem: "Erro ao cadastrar os pets!",
+                message: "Error registering pets!",
 
-                erros: errors
+                errors: errors
             })
         } else {
             console.log(error)
 
             return res.status(500).send({
-                mensagem: "Erro ao cadastrar o pet!"
+                message: "Error registering the pet!"
             })
         }
     }
@@ -72,18 +72,18 @@ exports.findAll = async (req, res) => {
 
         if (!allPets) {
             return res.status(404).send({
-                mensagem: "Nenhum animal encontrado!"
+                message: "No animals found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: allPets
+                message: allPets
             })
         }
     } catch (error) {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao retornar os pets!"
+            message: "Error returning pets!"
         })
     }
 }
@@ -94,7 +94,7 @@ exports.findRace = async (req, res) => {
 
         if (!race) {
             return res.status(400).send({
-                mensagem: "Digite o nome de uma raça!"
+                message: "Enter the name of a breed!"
             })
         }
 
@@ -102,18 +102,18 @@ exports.findRace = async (req, res) => {
 
         if (!raceVerify || raceVerify.length == 0) {
             return res.status(404).send({
-                mensagem: "Essa raça não foi cadastrada!"
+                message: "This breed has not been registered!"
             })
         } else {
             return res.status(200).send({
-                mensagem: raceVerify
+                message: raceVerify
             })
         }
     } catch (error) {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao efetuar a busca da raça!"
+            message: "Error when searching for the breed!"
         })
     }
 }
@@ -122,9 +122,9 @@ exports.findSpecie = async (req, res) => {
     try {
         const {specie} = req.body
 
-        if (!specie) {
+        if (!species) {
             return res.status(404).send({
-                mensagem: "Digite o nome de uma espécie!"
+                message: "Enter the name of a species!"
             })
         }
 
@@ -132,19 +132,19 @@ exports.findSpecie = async (req, res) => {
 
         if (!specieVerify) {
             return res.status(404).send({
-                mensagem: "Essa espécie não foi cadastrada!"
+                message: "This species has not been registered!"
             })
-        } 
-        
+        }
+       
         return res.status(200).send({
-            sucesso: "Pesquisa efetuada com sucesso!",
-            mensagem: specieVerify
+            success: "Search carried out successfully!",
+            message: specieVerify
         })
     } catch (error) {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao efatuar a busca da espécie!"
+            message: "Error performing the species search!"
         })
     }
 }
@@ -157,18 +157,18 @@ exports.findPetById = async (req, res) => {
 
         if (!petVerify) {
             return res.status(404).send({
-                mensagem: "Nenhum pet encontrado!"
+                message: "No pets found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: petVerify
+                message: petVerify
             })
         }
     } catch (error) {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao retornar um animal!"
+            message: "Error returning an animal!"
         })
     }
 }
@@ -179,7 +179,7 @@ exports.findPetByUser = async (req, res) => {
 
         if(!user_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do usuário!"
+                message: "Please provide user id!"
             })
         }
 
@@ -187,7 +187,7 @@ exports.findPetByUser = async (req, res) => {
 
         if(!validateUserId){
             return res.status(404).send({
-                mensagem: "Nenhum usuário foi encontrado com esse id!"
+                message: "No user was found with this id!"
             })
         }
 
@@ -195,18 +195,18 @@ exports.findPetByUser = async (req, res) => {
 
         if (!petVerify) {
             return res.status(404).send({
-                mensagem: "Este usuário não cadastrou nenhum animal!"
+                message: "This user has not registered any animals!"
             })
         } else {
             return res.status(200).send({
-                mensagem: petVerify
+                message: petVerify
             })
         }
     } catch (error) {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao retornar os animais que este usuário cadastrou!"
+            message: "Error returning the animals that this user registered!"
         })
     }
 }
@@ -217,17 +217,17 @@ exports.alterPet = async (req, res) => {
 
         if(!user_id || !pet_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça todas as informações necessárias!"
+                message: "Please provide all necessary information!"
             })
         }
 
-        const { name, specie, race, years } = req.body
+        const { name, species, race, years } = req.body
 
         const updatedFields = {}
 
         if (!name && !specie && !race && !years) {
             return res.status(400).send({
-                mensagem: "Por favor, digite o campo que você deseja alterar!"
+                message: "Please enter the field you want to change!"
             })
         }else{
             updatedFields.name = name
@@ -245,26 +245,26 @@ exports.alterPet = async (req, res) => {
 
         if (!updatedPet) {
             return res.status(404).send({
-                mensagem: "Nenhum animal com esse id foi encontrado!"
+                message: "No animals with this id were found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Pet alterado com sucesso!",
-                novas_info: updatedPet
+                message: "Pet changed successfully!",
+                nova_info: updatedPet
             })
         }
     } catch (error) {
         if (error instanceof yup.ValidationError) {
             const errors = captureErr
             return res.status(422).send({
-                mensagem: "Erro ao alterar os dados do animal!",
-                erros: errors
+                message: "Error changing animal data!",
+                errors: errors
             })
         } else {
             console.log(error)
 
             return res.status(500).send({
-                mensagem: "Erro ao alterar as informações do animal!"
+                message: "Error changing animal information!"
             })
         }
     }
@@ -276,7 +276,7 @@ exports.deletePet = async (req, res) => {
 
         if(!user_id || !pet_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça todas as informações necessárias!"
+                message: "Please provide all necessary information!"
             })
         }
 
@@ -287,18 +287,18 @@ exports.deletePet = async (req, res) => {
 
         if (!deletePet) {
             return res.status(404).send({
-                mensagem: "Nenhum animal foi encontrado!"
+                message: "No animals were found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Pet excuído com sucesso!",
+                message: "Pet deleted successfully!",
                 pet_detail: deletePet
             })
         }
     } catch (error) {
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao excluir o pet!"
+            message: "Error deleting pet!"
         })
     }
 }

@@ -5,24 +5,24 @@ const captureErrorYup = require("../utils/captureErrorYup")
 const Consultation = require("../models/Consultation")
 const jwt = require("jsonwebtoken")
 
-exports.newVeterinarian = async (req, res) => {
+exports.newVeterinarian = async(req, res) => {
     try {
         const { full_name, cfmv, college_graduated, specialty, professional_email, password, repeate_password } = req.body
 
         const VeterinarianSchema = yup.object().shape({
-            full_name: yup.string().required("O nome do veterinário é obrigatório!"),
+            full_name: yup.string().required("The vet's name is required!"),
 
-            cfmv: yup.string().required("O seu cfmv é obrigatório!"),
+            cfmv: yup.string().required("Your cfmv is required!"),
 
-            college_graduated: yup.string().required("O nome da faculdade é obrigatório!"),
+            college_graduated: yup.string().required("College name is required!"),
 
-            specialty: yup.string().required("Fornecer sua especialidade é obrigatório!"),
+            specialty: yup.string().required("Providing your specialty is required!"),
 
-            professional_email: yup.string().email("Digite um email válido!").required("O seu email profissional é obrigatório!"),
+            professional_email: yup.string().email("Please enter a valid email!").required("Your professional email is required!"),
 
-            password: yup.string().required("A senha é obrigatória!").min(6, "A senha deve ter no mínimo 6 caracteres!").max(30, "A senha deve ter no máximo 30 caracteres!"),
+            password: yup.string().required("The password is required!").min(6, "The password must have a minimum of 6 characters!").max(30, "The password must have a maximum of 30 characters! "),
 
-            repeate_password: yup.string().required("A confirmação da senha é obrigatória!").oneOf([password, null], "As senhas devem ser iguais!")
+            repeate_password: yup.string().required("Password confirmation is mandatory!").oneOf([password, null], "Passwords must be the same!")
         })
 
         await VeterinarianSchema.validate(req.body, { abortEarly: false })
@@ -31,7 +31,7 @@ exports.newVeterinarian = async (req, res) => {
 
         if (professionalEmailValidate) {
             return res.status(422).send({
-                mensagem: "Este email já foi cadastrado!"
+                message: "This email has already been registered!"
             })
         }
 
@@ -39,7 +39,7 @@ exports.newVeterinarian = async (req, res) => {
 
         if (cfmvValidate) {
             return res.status(422).send({
-                mensagem: "Este cfmv já foi cadastrado!"
+                message: "This cfmv has already been registered!"
             })
         }
 
@@ -56,10 +56,10 @@ exports.newVeterinarian = async (req, res) => {
 
         await newVeterinarian.save()
 
-        console.log("Veterinário salvo!")
+        console.log("Vet saved!")
 
         return res.status(201).send({
-            mensagem: "Veterinário cadastrado com sucesso!",
+            message: "Veterinarian registered successfully!",
             details: newVeterinarian
         })
     } catch (error) {
@@ -67,7 +67,7 @@ exports.newVeterinarian = async (req, res) => {
             const errors = [captureErrorYup(error)]
 
             return res.status(422).send({
-                mensagem: "Erro ao cadastrar o profissional!",
+                message: "Error registering the professional!",
 
                 errors: errors
             })
@@ -75,7 +75,7 @@ exports.newVeterinarian = async (req, res) => {
             console.log(error)
 
             return res.status(500).send({
-                mensagem: "Erro ao cadastrar o profissional!"
+                message: "Error registering the professional!"
             })
         }
     }
@@ -86,24 +86,24 @@ exports.findAll = async (req, res) => {
         const allVeterinarian = await Veterinarian.find()
 
         return res.status(200).send({
-            mensagem: "Pesquisa efetuada com sucesso!",
+            message: "Search completed successfully!",
             all_veterinarian: allVeterinarian
         })
     } catch (error) {
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao efetuar a pesquisa!"
+            message: "Error performing the search!"
         })
     }
 }
 
-exports.findVeterinarianById = async (req, res) => {
+exports.findVeterinarianById = async(req, res) => {
     try {
         const { veterinarian_id } = req.params
 
         if (!veterinarian_id) {
             return res.status(400).send({
-                mensagem: "Por favor, digite o id do veterinário!"
+                message: "Please enter vet id!"
             })
         }
 
@@ -111,29 +111,29 @@ exports.findVeterinarianById = async (req, res) => {
 
         if (!findingVeterinarian) {
             return res.status(404).send({
-                mensagem: "Nenhum veterinário encontrado!"
+                message: "No vet found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Veterinário encontrado com sucuesso!",
+                message: "Veterinarian found successfully!",
                 veterinarian_details: findingVeterinarian
             })
         }
     } catch (error) {
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao buscar o profissional!"
+            message: "Error searching for the professional!"
         })
     }
 }
 
-exports.findVeterinarianByName = async (req, res) => {
+exports.findVeterinarianByName = async(req, res) => {
     try {
         const { full_name } = req.body
 
         if (!full_name) {
             return res.status(400).send({
-                mensagem: "Por favor, digite o nome do veterinário que deseja pesquisar!"
+                message: "Please enter the name of the vet you want to search for!"
             })
         }
 
@@ -142,11 +142,11 @@ exports.findVeterinarianByName = async (req, res) => {
 
         if (!findingVeterinarian) {
             return res.status(404).send({
-                mensagem: "Nenhum veterinário encontrado!"
+                message: "No vet found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Pesquisa efetuada com sucesso!",
+                message: "Search completed successfully!",
 
                 veterinarian_details: findingVeterinarian
             })
@@ -155,7 +155,7 @@ exports.findVeterinarianByName = async (req, res) => {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao efetuar a pesquisa do veterinário!"
+            message: "Error performing the vet search!"
         })
     }
 }
@@ -166,7 +166,7 @@ exports.findAllConsultations = async (req, res) => {
 
         if (!veterinarian_id) {
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do veterinário!"
+                message: "Please provide vet id!"
             })
         }
 
@@ -176,11 +176,11 @@ exports.findAllConsultations = async (req, res) => {
 
         if (!findingAllConsultation || findingAllConsultation.length == 0) {
             return res.status(404).send({
-                mensagem: "Nenhuma consulta encontrada!"
+                message: "No queries found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Aqui estão as suas consultas:",
+                message: "Here are your queries:",
                 consultations_details: findingAllConsultation
             })
         }
@@ -188,25 +188,25 @@ exports.findAllConsultations = async (req, res) => {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao retornar as consultas!"
+            message: "Error returning queries!"
         })
     }
 }
 
-exports.alterVeterinarianEmail = async (req, res) => {
+exports.alterVeterinarianEmail = async(req, res) => {
     try {
         const { veterinarian_id } = req.params
 
         if (!veterinarian_id) {
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do veterinário!"
+                message: "Please provide vet id!"
             })
         }
 
         const { new_professional_email } = req.body
 
         const emailValidate = yup.object().shape({
-            new_professional_email: yup.string().required("O endereço de email é obrigatório!").email("Digite um email válido!")
+            new_professional_email: yup.string().required("Email address is required!").email("Please enter a valid email address!")
         })
 
         await emailValidate.validate(req.body, {abortEarly: false})
@@ -217,7 +217,7 @@ exports.alterVeterinarianEmail = async (req, res) => {
         })
 
         return res.status(200).send({
-            mensagem: "Email alterado com sucesso!",
+            message: "Email changed successfully!",
             details: {
                 new_email: new_professional_email
             }
@@ -227,14 +227,14 @@ exports.alterVeterinarianEmail = async (req, res) => {
             const Error = captureErrorYup(error)
 
             return res.status(422).send({
-                mensagem: "Erro ao alterar o email!",
+                message: "Error changing email!",
                 error: Error
             })
         } else {
             console.log(error)
 
             return res.status(500).send({
-                mensagem: "Erro ao alterar o email do veterinário!"
+                message: "Error changing vet's email!"
             })
         }
     }
@@ -246,7 +246,7 @@ exports.alterVeterinarianPass = async (req, res) => {
 
         if (!veterinarian_id) {
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do veterinário!"
+                message: "Please provide vet id!"
             })
         }
 
@@ -254,15 +254,15 @@ exports.alterVeterinarianPass = async (req, res) => {
 
         if (!new_password) {
             return res.status(400).send({
-                mensagem: "Por favor, digite a sua nova senha!"
+                message: "Please enter your new password!"
             })
         } else if (new_password.length < 6) {
             return res.status(422).send({
-                mensagem: "A senha deve ter no mínimo 6 caracteres!"
+                message: "The password must be at least 6 characters long!"
             })
         } else if (new_password.length > 30) {
             return res.status(422).send({
-                mensagem: "A senha deve ter no máximo 30 caracteres!"
+                message: "The password must be a maximum of 30 characters!"
             })
         }
 
@@ -275,18 +275,18 @@ exports.alterVeterinarianPass = async (req, res) => {
 
         if (!updatingVeterinarianPass) {
             return res.status(404).send({
-                mensagem: "Nenhum veterinário encontrado!"
+                message: "No vet found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Senha alterada com sucesso!"
+                message: "Password changed successfully!"
             })
         }
     } catch (error) {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao alterar a senha do veterinário!"
+            message: "Error changing vet password!"
         })
     }
 }
@@ -297,7 +297,7 @@ exports.deleteVeterinarianAccount = async (req, res) => {
 
         if (!veterinarian_id) {
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do veterinário!"
+                message: "Please provide vet id!"
             })
         }
 
@@ -305,17 +305,17 @@ exports.deleteVeterinarianAccount = async (req, res) => {
 
         if (!deleteVeterinarianAccount) {
             return res.status(404).send({
-                mensagem: "Nenhum veterinário encontrado!"
+                message: "No vet found!"
             })
         } else {
             return res.status(200).send({
-                mensagem: "Conta deletada com sucesso!"
+                message: "Account deleted successfully!"
             })
         }
     } catch (error) {
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao excluír conta!"
+            message: "Error deleting account!"
         })
     }
 }
@@ -326,7 +326,7 @@ exports.veterinarianLogin = async (req, res) => {
 
         if (!professional_email || !cfmv || !password) {
             return res.status(400).send({
-                mensagem: "Por favor, digite todas as informações!"
+                message: "Please enter all information!"
             })
         }
 
@@ -336,7 +336,7 @@ exports.veterinarianLogin = async (req, res) => {
 
         if (!checkIfVeterinarianExists || !checkPassword) {
             return res.status(422).send({
-                mensagem: "Por favor, digite todas as informações corretas!"
+                message: "Please enter all the correct information!"
             })
         }
 
@@ -347,7 +347,7 @@ exports.veterinarianLogin = async (req, res) => {
         }, veterinarianSecret)
 
         return res.status(200).send({
-            mensagem: "Login efetuado com sucesso!",
+            message: "Login successful!",
             token: token,
             veterinarian_id: checkIfVeterinarianExists.id
         })
@@ -355,7 +355,7 @@ exports.veterinarianLogin = async (req, res) => {
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao efetuar o login!"
+            message: "Error logging in!"
         })
     }
 }

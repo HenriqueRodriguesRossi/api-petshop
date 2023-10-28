@@ -9,7 +9,7 @@ app.use(express.urlencoded({extended: true}))
 const UserRouter = require("./routes/UserRouter")
 app.use(UserRouter)
 
-const VeterinarioRouter = require("./routes/VeterinarianRouter")
+const VeterinarianRouter = require("./routes/VeterinarianRouter")
 app.use(VeterinarioRouter)
 
 const PetRouter = require("./routes/PetRouter")
@@ -19,5 +19,5 @@ const ConsultationRouter = require("./routes/ConsultationRouter")
 app.use(ConsultationRouter)
 
 app.listen(8080, ()=>{
-    console.log("Servidor rodando!")
+     console.log("Server running!")
 })

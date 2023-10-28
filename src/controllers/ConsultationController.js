@@ -8,18 +8,18 @@ exports.newConsultation = async (req, res)=>{
 
         if(!user_id || !pet_id || !veterinarian_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça os ids do dono do pet, do pet e do veterinário que deseja marcar uma consulta!"
+                message: "Please provide the IDs of the pet owner, the pet and the veterinarian you wish to make an appointment with!"
             })
         }
 
         const {date_of_consultation, hour_of_consultation, comments} = req.body
 
         const consultationSchema = yup.object().shape({
-           date_of_consultation: yup.date("Digite uma data válida!").required("A data da consulta é obrigatória!").min(new Date(), "Não são aceitas datas no passado!"),
+           date_of_consultation: yup.date("Please enter a valid date!").required("The consultation date is required!").min(new Date(), "Dates in the past are not accepted!"),
 
-           hour_of_consultation: yup.string().required("O horário da consulta é obrigatório!"),
+           hour_of_consultation: yup.string().required("The consultation time is required!"),
 
-           comments: yup.string().min(3, "O comentátio deve ter no mínimo 3 caracteres!")
+           comments: yup.string().min(3, "The comment must have at least 3 characters!")
         })
 
         await consultationSchema.validate(req.body, {abortEarly: false})
@@ -31,7 +31,7 @@ exports.newConsultation = async (req, res)=>{
 
         if(checkHour){
             return res.status(422).send({
-                mensagem: "Poxa, esse veterinário não tem mais esse horário disponível!"
+                message: "Wow, this vet no longer has this time available!"
             })
         }
 
@@ -47,7 +47,7 @@ exports.newConsultation = async (req, res)=>{
         await newConsultation.save()
 
         return res.status(201).send({
-            mensagem: "Consulta marcada com sucesso!",
+            message: "Appointment scheduled successfully!",
             consultation_details: newConsultation
         })
     }catch(error){
@@ -55,14 +55,14 @@ exports.newConsultation = async (req, res)=>{
             const errors = [captureErrorYup(error)]
 
             return res.status(422).send({
-                mensagem: "Erro ao agendar a consulta!",
-                erros: errors
+                message: "Error scheduling the appointment!",
+                errors: errors
             })
         }else{
             console.log(error)
 
             return res.status(500).send({
-                mensagem: "Erro ao cadastrar a consulta!"
+                message: "Error registering the consultation!"
             })
         }
     }
@@ -74,7 +74,7 @@ exports.alterUserConsultation = async (req, res)=>{
 
         if(!user_id || !consultation_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do usuário e o id da consulta na URL da requisição!"
+                message: "Please provide the user id and query id in the request URL!"
             })
         }
 
@@ -82,20 +82,20 @@ exports.alterUserConsultation = async (req, res)=>{
 
         if(!new_date_of_consultation && !new_hour_of_consultation && !new_comments){
             return res.status(400).send({
-                mensagem: "Pelo menos um dos campos deve ser preencher!"
+                message: "At least one of the fields must be filled in!"
             })
         }
 
         const checkHour = await Consultation.findOne({veterinarian_id: consultation_id.veterinarian_id, date_of_consultation: new_date_of_consultation, hour_of_consultation: new_hour_of_consultation})
-        
+       
         if(checkHour){
             return res.status(422).send({
-                mensagem: "Horário indisponível!"
+                message: "Times unavailable!"
             })
         }
-    
+   
         const consultationValidate = await Consultation.findByIdAndUpdate({
-            _id: consultation_id, 
+            _id: consultation_id,
             owner_id: user_id,
             date_of_consultation: new_date_of_consultation,
             hour_of_consultation: new_hour_of_consultation,
@@ -104,18 +104,18 @@ exports.alterUserConsultation = async (req, res)=>{
 
         if(!consultationValidate){
             return res.status(404).send({
-                mensagem: "Nenhuma consulta foi encontrada!"
+                message: "No queries were found!"
             })
         }
-        
+       
         return res.status(200).send({
-            mensagem: "Consulta alterada com sucesso!"
+            message: "Query changed successfully!"
         })
     }catch(error){
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao alterar a consulta!"
+            message: "Error changing query!"
         })
     }
 }
@@ -126,24 +126,24 @@ exports.findUserConsultation = async (req, res)=>{
 
         if(!user_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do usuário!"
+                message: "Please provide user id!"
             })
         }
-        
+       
         const getUserConsultation = await Consultation.find({
             owner_id: user_id
         })
 
         return res.status(200).send({
-            mensagem: "Sucesso!",
-            
+            message: "Success!",
+           
             consultations_details: getUserConsultation
         })
     }catch(error){
         console.log(error)
 
         return res.status(500).send({
-            mensagem: "Erro ao retornar as consultas!"
+            message: "Error returning queries!"
         })
     }
 }
@@ -151,25 +151,25 @@ exports.findUserConsultation = async (req, res)=>{
 exports.deleteConsultation = async (req, res)=>{
     try{
         const {user_id, consultation_id} = req.params
-    
+   
         if(!user_id || !consultation_id){
             return res.status(400).send({
-                mensagem: "Por favor, forneça o id do usuário e o id da consulta!"
+                message: "Please provide user id and query id!"
             })
         }
-    
+   
         const deleteConsultation = await Consultation.findByIdAndDelete({
             _id: consultation_id
         })
-    
+   
         return res.status(200).send({
-            mensagem: "Consulta excluída com sucesso!",
+            message: "Query deleted successfully!",
             details: deleteConsultation
         })
     }catch(error){
         console.log(error)
         return res.status(500).send({
-            mensagem: "Erro ao deletar consulta!"
+            message: "Error deleting query!"
         })
     }
 }
